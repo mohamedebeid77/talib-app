@@ -3,13 +3,13 @@ import {
   Palette, 
   Download, 
   Upload, 
-  Trash2, 
   Check, 
   Copy, 
   HardDrive, 
-  Smartphone,
   ShieldCheck,
-  Sparkles
+  Flame,
+  RotateCcw,
+  PlusCircle
 } from 'lucide-react';
 import { AppTheme, ReaderTheme, Book } from '../types';
 
@@ -17,24 +17,31 @@ interface SettingsScreenProps {
   theme: AppTheme;
   readerTheme: ReaderTheme;
   books: Book[];
+  currentStreak?: number;
   onThemeChange: (theme: AppTheme) => void;
   onReaderThemeChange: (rTheme: ReaderTheme) => void;
   onExport: () => string;
   onImport: (json: string) => boolean;
+  onResetStreak?: () => void;
+  onSimulateStreak?: () => void;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   theme,
   readerTheme,
   books,
+  currentStreak = 0,
   onThemeChange,
   onReaderThemeChange,
   onExport,
   onImport,
+  onResetStreak,
+  onSimulateStreak,
 }) => {
   const [copied, setCopied] = useState(false);
   const [importInput, setImportInput] = useState('');
   const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [streakActionMsg, setStreakActionMsg] = useState<string | null>(null);
 
   const handleCopyBackup = () => {
     const json = onExport();
@@ -64,6 +71,22 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       setImportStatus('عذراً، صيغة الملف غير صالحة.');
     }
     setTimeout(() => setImportStatus(null), 3500);
+  };
+
+  const handleResetStreak = () => {
+    if (onResetStreak) {
+      onResetStreak();
+      setStreakActionMsg('تم تصفير السجل وبدء استريك حقيقي نقي من اليوم!');
+      setTimeout(() => setStreakActionMsg(null), 3500);
+    }
+  };
+
+  const handleSimulateStreak = () => {
+    if (onSimulateStreak) {
+      onSimulateStreak();
+      setStreakActionMsg('تمت إضافة يوم التزام بنجاح لاختبار تتابع الاستريك!');
+      setTimeout(() => setStreakActionMsg(null), 3500);
+    }
   };
 
   const themesList = [
@@ -99,8 +122,49 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           <span>الإعدادات والمظهر</span>
         </h2>
         <p className="text-xs text-theme-muted">
-          تخصيص الواجهة، إدارة الذاكرة، والنسخ الاحتياطي.
+          تخصيص الواجهة، إدارة الاستريك الحقيقي، والنسخ الاحتياطي.
         </p>
+      </div>
+
+      {/* Streak Management Card */}
+      <div className="p-4 rounded-2xl bg-theme-surface border border-theme-border space-y-3">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xs font-cairo font-bold text-theme-text flex items-center gap-1.5">
+            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+            <span>نظام المواظبة والاستريك الحقيقي</span>
+          </h4>
+          <span className="text-xs font-cairo font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
+            {currentStreak} أيام متتالية
+          </span>
+        </div>
+
+        <p className="text-xs text-theme-muted leading-relaxed">
+          الاستريك يُحسب تلقائياً وبدقة عند قراءتك صفحة واحدة على الأقل أو دقيقة يومياً. يمكنك تصفير السجل لبدء تتبع حقيقي 100%، أو محاكاة يوم لاختبار تتابع الأيام.
+        </p>
+
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <button
+            onClick={handleResetStreak}
+            className="p-2.5 rounded-xl border border-theme-border bg-theme-bg/80 hover:border-red-500/50 text-xs font-cairo font-bold text-red-400 flex items-center justify-center gap-1.5 transition-all"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>تصفير السجل التجريبي</span>
+          </button>
+
+          <button
+            onClick={handleSimulateStreak}
+            className="p-2.5 rounded-xl border border-theme-border bg-theme-bg/80 hover:border-amber-500/50 text-xs font-cairo font-bold text-amber-400 flex items-center justify-center gap-1.5 transition-all"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>+1 يوم تتابع (اختبار)</span>
+          </button>
+        </div>
+
+        {streakActionMsg && (
+          <p className="text-xs font-cairo font-bold text-emerald-400 text-center bg-emerald-500/10 py-1.5 rounded-lg border border-emerald-500/20">
+            {streakActionMsg}
+          </p>
+        )}
       </div>
 
       {/* Theme Picker */}
@@ -154,7 +218,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       {/* Reader Mode Selection */}
       <div className="p-4 rounded-2xl bg-theme-surface border border-theme-border space-y-3">
         <h4 className="text-xs font-cairo font-bold text-theme-text">
-          وضع عارض القراءة الافتراضي
+          ثيم عارض القراءة الافتراضي
         </h4>
         <div className="grid grid-cols-3 gap-2">
           {[

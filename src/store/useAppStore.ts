@@ -3,53 +3,34 @@ import initialBooksData from '../data/books.json';
 import { Book, BookProgress, UserStats, UserNote, AppTheme, ReaderTheme, DailyActivity } from '../types';
 import { getLocalDateString, getDaysAgoDateString, calculateStreak } from '../utils/streakUtils';
 
-const STORAGE_KEY_PROGRESS = 'talib_progress_v2';
-const STORAGE_KEY_STATS = 'talib_stats_v2';
-const STORAGE_KEY_THEME = 'talib_theme_v2';
-const STORAGE_KEY_NOTES = 'talib_notes_v2';
+const STORAGE_KEY_PROGRESS = 'talib_progress_v3';
+const STORAGE_KEY_STATS = 'talib_stats_v3';
+const STORAGE_KEY_THEME = 'talib_theme_v3';
+const STORAGE_KEY_NOTES = 'talib_notes_v3';
 
 const getInitialHistory = (): Record<string, DailyActivity> => {
   const today = getLocalDateString();
-  const yesterday = getDaysAgoDateString(1);
-  const dayBefore = getDaysAgoDateString(2);
-
   return {
-    [dayBefore]: {
-      date: dayBefore,
-      minutes: 15,
-      pages: 8,
-      books_read: ['usul-thalatha'],
-    },
-    [yesterday]: {
-      date: yesterday,
-      minutes: 20,
-      pages: 10,
-      books_read: ['usul-thalatha'],
-    },
     [today]: {
       date: today,
-      minutes: 6,
-      pages: 3,
-      books_read: ['usul-thalatha'],
+      minutes: 0,
+      pages: 0,
+      books_read: [],
     },
   };
 };
 
 const getInitialStats = (): UserStats => {
-  const history = getInitialHistory();
   const todayStr = getLocalDateString();
-  const { currentStreak, longestStreak } = calculateStreak(history);
-  const todayAct = history[todayStr] || { minutes: 0, pages: 0, books_read: [] };
-
   return {
-    streak_days: currentStreak,
-    longest_streak: longestStreak,
+    streak_days: 0,
+    longest_streak: 0,
     last_active_date: todayStr,
-    minutes_read_today: todayAct.minutes,
-    pages_read_today: todayAct.pages,
-    total_minutes_read: 41,
+    minutes_read_today: 0,
+    pages_read_today: 0,
+    total_minutes_read: 0,
     active_book_id: 'usul-thalatha',
-    activity_history: history,
+    activity_history: getInitialHistory(),
   };
 };
 
@@ -57,17 +38,10 @@ const getInitialProgress = (): Record<string, BookProgress> => {
   return {
     'usul-thalatha': {
       book_id: 'usul-thalatha',
-      current_page: 8,
+      current_page: 1,
       total_pages: 28,
       is_finished: false,
-      last_read_timestamp: Date.now() - 3600000 * 2,
-    },
-    'qawaid-arbaa': {
-      book_id: 'qawaid-arbaa',
-      current_page: 0,
-      total_pages: 16,
-      is_finished: false,
-      last_read_timestamp: 0,
+      last_read_timestamp: Date.now(),
     },
   };
 };
@@ -125,15 +99,7 @@ export const useAppStore = () => {
   const [notes, setNotes] = useState<UserNote[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_NOTES);
-      return saved ? JSON.parse(saved) : [
-        {
-          id: 'note-1',
-          book_id: 'usul-thalatha',
-          page_number: 4,
-          content: 'الأصل الأول: معرفة العبد ربه بالآيات والمخلوقات، والفرق بين آيات الله ومصنوعاته.',
-          created_at: Date.now() - 86400000,
-        }
-      ];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
@@ -273,89 +239,98 @@ export const useAppStore = () => {
     setNotes((prev) => prev.filter((n) => n.id !== noteId));
   };
 
-  const attachLocalPdf = (bookId: string, filename: string, sizeBytes: number, pagesCount: number) => {
+  const attachLocalPdf = (bookId: string, fileName: string) => {
     setBooks((prev) =>
-      prev.map((b) =>
-        b.id === bookId
-          ? {
-              ...b,
-              pdf_filename: filename,
-              size_bytes: sizeBytes,
-              pages: pagesCount || b.pages,
-            }
-          : b
-      )
+      prev.map((b) => (b.id === bookId ? { ...b, pdf_filename: fileName } : b))
     );
   };
 
-  const getOverallProgress = () => {
+  const getLevelProgress = (levelNum: number): { completed: number; total: number; percentage: number } => {
+    const levelBooks = books.filter((b) => b.level === levelNum);
+    const total = levelBooks.length;
+    if (total === 0) return { completed: 0, total: 0, percentage: 0 };
+
+    const completed = levelBooks.filter((b) => progress[b.id]?.is_finished).length;
+    const percentage = Math.round((completed / total) * 100);
+    return { completed, total, percentage };
+  };
+
+  const getOverallProgress = (): number => {
     const coreBooks = books.filter((b) => b.level <= 3);
-    if (!coreBooks.length) return 0;
-
-    let totalWeight = 0;
-    let completedWeight = 0;
-
-    coreBooks.forEach((book) => {
-      const bookPages = book.pages || 30;
-      totalWeight += bookPages;
-      const p = progress[book.id];
-      if (p) {
-        if (p.is_finished) {
-          completedWeight += bookPages;
-        } else {
-          completedWeight += (p.current_page / (p.total_pages || bookPages)) * bookPages;
-        }
-      }
-    });
-
-    return totalWeight > 0 ? Math.round((completedWeight / totalWeight) * 100) : 0;
+    if (coreBooks.length === 0) return 0;
+    const finished = coreBooks.filter((b) => progress[b.id]?.is_finished).length;
+    return Math.round((finished / coreBooks.length) * 100);
   };
 
-  const getLevelProgress = (levelNumber: number) => {
-    const levelBooks = books.filter((b) => b.level === levelNumber);
-    if (!levelBooks.length) return 0;
-
-    let totalPercentage = 0;
-    levelBooks.forEach((b) => {
-      const p = progress[b.id];
-      if (p) {
-        if (p.is_finished) {
-          totalPercentage += 100;
-        } else {
-          const total = p.total_pages || b.pages || 1;
-          totalPercentage += Math.min(100, Math.round((p.current_page / total) * 100));
-        }
-      }
-    });
-
-    return Math.round(totalPercentage / levelBooks.length);
-  };
-
-  const exportBackup = () => {
-    return JSON.stringify(
-      {
-        version: 2,
-        exported_at: new Date().toISOString(),
-        progress,
-        stats,
-        notes,
-        theme,
+  // Reset to authentic 0-day clean streak
+  const resetToRealStreak = () => {
+    const todayStr = getLocalDateString();
+    const freshStats: UserStats = {
+      streak_days: 0,
+      longest_streak: 0,
+      last_active_date: todayStr,
+      minutes_read_today: 0,
+      pages_read_today: 0,
+      total_minutes_read: 0,
+      active_book_id: 'usul-thalatha',
+      activity_history: {
+        [todayStr]: {
+          date: todayStr,
+          minutes: 0,
+          pages: 0,
+          books_read: [],
+        },
       },
-      null,
-      2
-    );
+    };
+    setStats(freshStats);
   };
 
-  const importBackup = (jsonStr: string) => {
+  // Simulation tool for testing streak accumulation (adds active reading to yesterday/earlier)
+  const simulateStreakIncrement = () => {
+    setStats((prev) => {
+      const history = { ...prev.activity_history };
+      const daysBack = (prev.streak_days || 0) + 1;
+      const pastDate = getDaysAgoDateString(daysBack);
+      history[pastDate] = {
+        date: pastDate,
+        minutes: 20,
+        pages: 6,
+        books_read: ['usul-thalatha'],
+      };
+      const { currentStreak, longestStreak } = calculateStreak(history);
+      return {
+        ...prev,
+        streak_days: currentStreak,
+        longest_streak: Math.max(longestStreak, prev.longest_streak),
+        activity_history: history,
+      };
+    });
+  };
+
+  // Export JSON backup
+  const exportBackup = (): string => {
+    return JSON.stringify({
+      version: 3,
+      exported_at: new Date().toISOString(),
+      stats,
+      progress,
+      notes,
+      theme,
+      readerTheme,
+    }, null, 2);
+  };
+
+  // Import JSON backup
+  const importBackup = (jsonStr: string): boolean => {
     try {
       const data = JSON.parse(jsonStr);
-      if (data.progress) setProgress(data.progress);
       if (data.stats) setStats(data.stats);
+      if (data.progress) setProgress(data.progress);
       if (data.notes) setNotes(data.notes);
-      if (data.theme) setTheme(data.theme);
+      if (data.theme) setThemeState(data.theme);
+      if (data.readerTheme) setReaderTheme(data.readerTheme);
       return true;
-    } catch (err) {
-      console.error('Failed to import backup:', err);
+    } catch {
       return false;
     }
   };
@@ -372,13 +347,15 @@ export const useAppStore = () => {
     setTheme,
     setReaderTheme,
     updateBookProgress,
-    markBookFinished,
     recordReadingSession,
+    markBookFinished,
     addNote,
     deleteNote,
     attachLocalPdf,
-    getOverallProgress,
     getLevelProgress,
+    getOverallProgress,
+    resetToRealStreak,
+    simulateStreakIncrement,
     exportBackup,
     importBackup,
   };

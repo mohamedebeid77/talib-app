@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   ChevronRight, 
@@ -7,12 +7,13 @@ import {
   Minimize2, 
   Bookmark, 
   Clock, 
-  Sparkles,
-  BookOpen,
   FileText,
-  Type
+  Type,
+  ExternalLink,
+  BookOpen
 } from 'lucide-react';
 import { Book, ReaderTheme } from '../types';
+import { getPageContent } from '../data/bookExcerpts';
 
 interface ReaderModalProps {
   book: Book | null;
@@ -34,21 +35,22 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
   onClose,
   onPageChange,
   onAddNote,
-  onReaderThemeChange,
   onRecordReadingSession,
 }) => {
   if (!isOpen || !book) return null;
 
-  const totalPages = book.pages || 28;
+  const totalPages = book.pages || 30;
   const [currentPage, setCurrentPage] = useState<number>(startPage || 1);
-  const [fontSize, setFontSize] = useState<number>(19);
+  const [fontSize, setFontSize] = useState<number>(20);
   const [isZenMode, setIsZenMode] = useState<boolean>(false);
   const [showNoteInput, setShowNoteInput] = useState<boolean>(false);
   const [quickNote, setQuickNote] = useState<string>('');
   const [sessionSeconds, setSessionSeconds] = useState<number>(0);
+  // Default to PDF if available, otherwise text
   const [viewMode, setViewMode] = useState<'text' | 'pdf'>('text');
+  const [pageTurnAnimation, setPageTurnAnimation] = useState<boolean>(false);
 
-  // Active reading timer
+  // Sync state when book opens
   useEffect(() => {
     setCurrentPage(startPage || 1);
     setSessionSeconds(0);
@@ -62,28 +64,32 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
     };
   }, [startPage, book?.id]);
 
-  // Flush accumulated reading time
+  // Record 1 minute of active reading every 60 seconds
   useEffect(() => {
     if (sessionSeconds > 0 && sessionSeconds % 60 === 0) {
       onRecordReadingSession(book.id, 1, 0);
     }
   }, [sessionSeconds, book.id, onRecordReadingSession]);
 
+  const triggerPageFeedback = (newPage: number) => {
+    setCurrentPage(newPage);
+    onPageChange(book.id, newPage);
+    setPageTurnAnimation(true);
+    setTimeout(() => setPageTurnAnimation(false), 300);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(25);
+    }
+  };
+
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      const next = currentPage + 1;
-      setCurrentPage(next);
-      onPageChange(book.id, next);
-      if (navigator.vibrate) navigator.vibrate(30);
+      triggerPageFeedback(currentPage + 1);
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      const prev = currentPage - 1;
-      setCurrentPage(prev);
-      onPageChange(book.id, prev);
-      if (navigator.vibrate) navigator.vibrate(30);
+      triggerPageFeedback(currentPage - 1);
     }
   };
 
@@ -101,21 +107,21 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
       bg: '#090A0C',
       text: '#EDE8DF',
       border: '#1F242D',
-      barBg: 'rgba(15, 17, 22, 0.95)',
+      barBg: 'rgba(15, 17, 22, 0.96)',
       accent: '#D4AF37',
     },
     sepia: {
       bg: '#F5EFE0',
       text: '#2C2216',
       border: '#E2D5BE',
-      barBg: 'rgba(239, 230, 214, 0.95)',
+      barBg: 'rgba(239, 230, 214, 0.96)',
       accent: '#8C5E24',
     },
     slate: {
       bg: '#161920',
       text: '#E2E6ED',
       border: '#282F3D',
-      barBg: 'rgba(26, 31, 41, 0.95)',
+      barBg: 'rgba(26, 31, 41, 0.96)',
       accent: '#38BDF8',
     },
   }[readerTheme];
@@ -126,27 +132,20 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
     return `${mins}:${String(s).padStart(2, '0')}`;
   };
 
-  // Classical text content for Level 1 books
-  const sampleExcerpts: Record<string, string[]> = {
-    'usul-thalatha': [
-      'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ\n\nاعْلَمْ رَحِمَكَ اللَّهُ أَنَّهُ يَجِبُ عَلَيْنَا تَعَلُّمُ أَرْبَعِ مَسَائِلَ:\n\nالْمَسْأَلَةُ الأُولَى: الْعِلْمُ؛ وَهُوَ مَعْرِفَةُ اللَّهِ، وَمَعْرِفَةُ نَبِيِّهِ ﷺ، وَمَعْرِفَةُ دِينِ الإِسْلامِ بِالأَدِلَّةِ.\n\nالثَّانِيَةُ: الْعَمَلُ بِهِ.\nالثَّالِثَةُ: الدَّعْوَةُ إِلَيْهِ.\nالرَّابِعَةُ: الصَّبْرُ عَلَى الأَذَى فِيهِ.\n\nوَالدَّلِيلُ قَوْلُهُ تَعَالَى: {وَالْعَصْرِ (1) إِنَّ الْإِنْسَانَ لَفِي خُسْرٍ (2) إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ (3)}.',
-      'قَالَ الشَّافِعِيُّ رَحِمَهُ اللَّهُ تَعَالَى:\n«لَوْ مَا أَنْزَلَ اللَّهُ حُجَّةً عَلَى خَلْقِهِ إِلَّا هَذِهِ السُّورَةَ لَكَفَتْهُمْ».\n\nوَقَالَ الْبُخَارِيُّ رَحِمَهُ اللَّهُ تَعَالَى:\n«بَابُ الْعِلْمِ قَبْلَ الْقَوْلِ وَالْعَمَلِ»؛ وَالدَّلِيلُ قَوْلُهُ تَعَالَى: {فَاعْلَمْ أَنَّهُ لَا إِلَهَ إِلَّا اللَّهُ وَاسْتَغْفِرْ لِذَنْبِكَ} فَبَدَأَ بِالْعِلْمِ قَبْلَ الْقَوْلِ وَالْعَمَلِ.\n\nاعْلَمْ رَحِمَكَ اللَّهُ أَنَّهُ يَجِبُ عَلَى كُلِّ مُسْلِمٍ وَمُسْلِمَةٍ تَعَلُّمُ هَذِهِ الْمَسَائِلِ الثَّلَاثِ، وَالْعَمَلُ بِهِنَّ...',
-      'الأُولَى: أَنَّ اللَّهَ خَلَقَنَا، وَرَزَقَنَا، وَلَمْ يَتْرُكْنَا هَمَلًا، بَلْ أَرْسَلَ إِلَيْنَا رَسُولًا، فَمَنْ أَطَاعَهُ دَخَلَ الْجَنَّةَ، وَمَنْ عَصَاهُ دَخَلَ النَّارَ، وَالدَّلِيلُ قَوْلُهُ تَعَالَى: {إِنَّا أَرْسَلْنَا إِلَيْكُمْ رَسُولًا شَاهِدًا عَلَيْكُمْ كَمَا أَرْسَلْنَا إِلَى فِرْعَوْنَ رَسُولًا * فَعَصَى فِرْعَوْنُ الرَّسُولَ فَأَخَذْنَاهُ أَخْذًا وَبِيلًا}.\n\nالثَّانِيَةُ: أَنَّ اللَّهَ لَا يَرْضَى أَنْ يُشْرَكَ مَعَهُ أَحَدٌ فِي عِبَادَتِهِ، لَا مَلَكٌ مُقَرَّبٌ، وَلَا نَبِيٌّ مُرْسَلٌ، وَالدَّلِيلُ قَوْلُهُ تَعَالَى: {وَأَنَّ الْمَسَاجِدَ لِلَّهِ فَلَا تَدْعُوا مَعَ اللَّهِ أَحَدًا}...',
-    ],
-    'qawaid-arbaa': [
-      'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ\n\nأَسْأَلُ اللَّهَ الْكَرِيمَ، رَبَّ الْعَرْشِ الْعَظِيمِ، أَنْ يَتَوَلَّاكَ فِي الدُّنْيَا وَالْآخِرَةِ، وَأَنْ يَجْعَلَكَ مُبَارَكًا أَيْنَمَا كُنْتَ، وَأَنْ يَجْعَلَكَ مِمَّنْ إِذَا أُعْطِيَ شَكَرَ، وَإِذَا ابْتُلِيَ صَبَرَ، وَإِذَا أَذْنَبَ اسْتَغْفَرَ؛ فَإِنَّ هَؤُلَاءِ الثَّلَاثَ عُنْوَانُ السَّعَادَةِ.\n\nاعْلَمْ أَرْشَدَكَ اللَّهُ لِطَاعَتِهِ: أَنَّ الْحَنِيفِيَّةَ مِلَّةَ إِبْرَاهِيمَ: أَنْ تَعْبُدَ اللَّهَ وَحْدَهُ مُخْلِصًا لَهُ الدِّينَ...',
-    ],
-  };
-
-  const currentText =
-    sampleExcerpts[book.id]?.[Math.min(currentPage - 1, (sampleExcerpts[book.id]?.length || 1) - 1)] ||
-    `الصفحة رقم (${currentPage})\n\nمتن: ${book.title_ar}\nتأليف: الشيخ ${book.author_ar}\n\n(هنا يتم عرض نص أو صفحات الـ PDF المدمج أو المرفق محلياً مع دعم التمرير المستمر والتكبير باللمس وحفظ الموضع تلقائياً).`;
+  // Resolve content for current page
+  const pageContent = getPageContent(
+    book.id,
+    book.title_ar,
+    book.author_ar,
+    currentPage,
+    totalPages
+  );
 
   const pdfUrl = book.pdf_filename ? `/assets/books/${book.pdf_filename}` : null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col transition-colors duration-300"
+      className="fixed inset-0 z-50 flex flex-col transition-colors duration-300 select-none"
       style={{ backgroundColor: themeStyles.bg, color: themeStyles.text }}
     >
       {/* Top Reading Navigation Bar (Hides in Zen Mode) */}
@@ -170,11 +169,13 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               <h3 className="font-amiri font-bold text-base line-clamp-1">
                 {book.title_ar}
               </h3>
-              <div className="flex items-center gap-2 text-[11px] opacity-70">
-                <span>صفحة {currentPage} من {totalPages}</span>
+              <div className="flex items-center gap-2 text-[11px] opacity-75">
+                <span className="font-cairo font-bold text-theme-accent">
+                  صفحة {currentPage} من {totalPages}
+                </span>
                 <span>•</span>
-                <span className="flex items-center gap-1 font-cairo font-bold text-theme-accent">
-                  <Clock className="w-3 h-3" />
+                <span className="flex items-center gap-1 font-cairo text-theme-muted">
+                  <Clock className="w-3 h-3 text-theme-accent" />
                   <span>{formatTimer(sessionSeconds)}</span>
                 </span>
               </div>
@@ -187,11 +188,11 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
             {pdfUrl && (
               <button
                 onClick={() => setViewMode(viewMode === 'text' ? 'pdf' : 'text')}
-                className="px-2.5 py-1 rounded-lg text-xs font-bold font-cairo bg-theme-accent/15 text-theme-accent border border-theme-accent/30 flex items-center gap-1 hover:bg-theme-accent/25 transition-all"
-                title="التبديل بين قراءة النص وقراءة ملف الـ PDF الأصلي"
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold font-cairo bg-theme-accent/15 text-theme-accent border border-theme-accent/30 flex items-center gap-1 hover:bg-theme-accent/25 transition-all"
+                title={viewMode === 'text' ? 'التبديل إلى نسخة PDF الأصلية المصورة' : 'التبديل إلى القراءة النصية المشكولة المريحة'}
               >
                 {viewMode === 'text' ? <FileText className="w-3.5 h-3.5" /> : <Type className="w-3.5 h-3.5" />}
-                <span>{viewMode === 'text' ? 'نسخة PDF' : 'نص مريح'}</span>
+                <span>{viewMode === 'text' ? 'نسخة PDF' : 'نص مشكول'}</span>
               </button>
             )}
 
@@ -204,24 +205,24 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               <Bookmark className="w-4 h-4" />
             </button>
 
-            {/* Font size down */}
+            {/* Font size controls (in Text mode) */}
             {viewMode === 'text' && (
-              <>
+              <div className="flex items-center bg-black/10 rounded-lg p-0.5">
                 <button
                   onClick={() => setFontSize((s) => Math.max(14, s - 2))}
-                  className="px-2 py-1 rounded-lg text-xs font-bold hover:bg-black/10"
+                  className="px-2 py-1 text-xs font-bold hover:bg-black/15 rounded"
                   title="تصغير الخط"
                 >
                   A-
                 </button>
                 <button
-                  onClick={() => setFontSize((s) => Math.min(28, s + 2))}
-                  className="px-2 py-1 rounded-lg text-xs font-bold hover:bg-black/10"
+                  onClick={() => setFontSize((s) => Math.min(30, s + 2))}
+                  className="px-2 py-1 text-xs font-bold hover:bg-black/15 rounded"
                   title="تكبير الخط"
                 >
                   A+
                 </button>
-              </>
+              </div>
             )}
 
             {/* Fullscreen / Zen mode */}
@@ -240,10 +241,10 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
       {isZenMode && (
         <button
           onClick={() => setIsZenMode(false)}
-          className="fixed top-4 left-4 z-40 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-xs flex items-center gap-1.5 opacity-40 hover:opacity-100 transition-opacity"
+          className="fixed top-4 left-4 z-40 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-md text-white text-xs flex items-center gap-1.5 opacity-50 hover:opacity-100 transition-opacity"
         >
           <Minimize2 className="w-3.5 h-3.5" />
-          <span>إلغاء الوضع الكامل</span>
+          <span>إلغاء وضع ملء الشاشة</span>
         </button>
       )}
 
@@ -278,21 +279,51 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           onClick={() => {
             if (isZenMode) setIsZenMode(false);
           }}
-          className="flex-1 overflow-y-auto px-6 py-8 max-w-2xl mx-auto w-full select-text transition-all leading-relaxed"
+          className={`flex-1 overflow-y-auto px-6 py-8 max-w-2xl mx-auto w-full select-text transition-opacity duration-200 leading-relaxed ${
+            pageTurnAnimation ? 'opacity-40 scale-[0.99]' : 'opacity-100 scale-100'
+          }`}
         >
+          {/* Chapter header */}
+          <div className="mb-6 pb-3 border-b border-white/10 flex items-center justify-between">
+            <span className="text-xs font-cairo font-bold px-2.5 py-1 rounded-md bg-theme-accent/15 text-theme-accent">
+              {pageContent.title}
+            </span>
+            <span className="text-xs font-cairo text-theme-muted">
+              صفحة {currentPage} / {totalPages}
+            </span>
+          </div>
+
+          {/* Book Text */}
           <div
             className="font-amiri text-justify whitespace-pre-line tracking-wide transition-all"
-            style={{ fontSize: `${fontSize}px`, lineHeight: 2.1 }}
+            style={{ fontSize: `${fontSize}px`, lineHeight: 2.2 }}
           >
-            {currentText}
+            {pageContent.text}
           </div>
         </main>
       ) : (
-        <main className="flex-1 w-full h-full bg-neutral-900 relative">
+        <main className="flex-1 w-full h-full bg-neutral-900 relative flex flex-col">
+          {/* Top PDF indicator */}
+          <div className="bg-neutral-800/90 text-white/80 px-4 py-1.5 text-xs flex items-center justify-between border-b border-neutral-700">
+            <span className="font-cairo">
+              نسخة الـ PDF الأصلية • الانتقال لصفحة: <b className="text-amber-400">{currentPage}</b>
+            </span>
+            <a
+              href={`${pdfUrl}#page=${currentPage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline flex items-center gap-1 text-[11px]"
+            >
+              <span>فتح بمستعرض خارجي</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+
           <iframe
+            key={`${book.id}-page-${currentPage}`}
             src={`${pdfUrl}#page=${currentPage}&toolbar=0&navpanes=0`}
-            className="w-full h-full border-0"
-            title={book.title_ar}
+            className="w-full flex-1 border-0"
+            title={`${book.title_ar} - صفحة ${currentPage}`}
           />
         </main>
       )}
@@ -306,18 +337,19 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
             borderColor: themeStyles.border,
           }}
         >
+          {/* Next Button */}
           <button
             onClick={handleNextPage}
             disabled={currentPage >= totalPages}
-            className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-bold disabled:opacity-30 hover:bg-black/10 transition-all font-cairo"
+            className="flex items-center gap-1 px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-30 bg-theme-accent text-theme-bg shadow-sm hover:opacity-90 active:scale-95 transition-all font-cairo"
           >
             <ChevronRight className="w-4 h-4" />
-            <span>التالي</span>
+            <span>التالي ({Math.min(totalPages, currentPage + 1)})</span>
           </button>
 
           {/* Slider for page jumping */}
-          <div className="flex items-center gap-2 flex-1 max-w-xs mx-4">
-            <span className="text-[11px] font-cairo opacity-70">
+          <div className="flex items-center gap-2 flex-1 max-w-xs mx-3">
+            <span className="text-[11px] font-cairo font-bold text-theme-accent">
               {currentPage}
             </span>
             <input
@@ -327,20 +359,20 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               value={currentPage}
               onChange={(e) => {
                 const p = Number(e.target.value);
-                setCurrentPage(p);
-                onPageChange(book.id, p);
+                triggerPageFeedback(p);
               }}
-              className="w-full accent-amber-500 cursor-pointer"
+              className="w-full accent-amber-500 cursor-pointer h-1.5 rounded-lg bg-white/20"
             />
-            <span className="text-[11px] font-cairo opacity-70">
+            <span className="text-[11px] font-cairo text-theme-muted">
               {totalPages}
             </span>
           </div>
 
+          {/* Prev Button */}
           <button
             onClick={handlePrevPage}
             disabled={currentPage <= 1}
-            className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-bold disabled:opacity-30 hover:bg-black/10 transition-all font-cairo"
+            className="flex items-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold disabled:opacity-30 border border-theme-border hover:bg-black/10 active:scale-95 transition-all font-cairo text-theme-text"
           >
             <span>السابق</span>
             <ChevronLeft className="w-4 h-4" />

@@ -19,6 +19,7 @@ export const App: React.FC = () => {
   const [readerStartPage, setReaderStartPage] = useState<number>(1);
 
   const overallProgress = store.getOverallProgress();
+  const getLevelPercentage = (level: number) => store.getLevelProgress(level).percentage;
 
   const handleOpenBookDetail = (book: Book) => {
     setSelectedBook(book);
@@ -80,7 +81,7 @@ export const App: React.FC = () => {
           <PathScreen
             books={store.books}
             progress={store.progress}
-            getLevelProgress={store.getLevelProgress}
+            getLevelProgress={getLevelPercentage}
             onOpenBook={handleOpenBookDetail}
           />
         )}
@@ -91,7 +92,7 @@ export const App: React.FC = () => {
             progress={store.progress}
             stats={store.stats}
             overallProgress={overallProgress}
-            getLevelProgress={store.getLevelProgress}
+            getLevelProgress={getLevelPercentage}
           />
         )}
 
@@ -100,10 +101,13 @@ export const App: React.FC = () => {
             theme={store.theme}
             readerTheme={store.readerTheme}
             books={store.books}
+            currentStreak={store.stats.streak_days}
             onThemeChange={store.setTheme}
             onReaderThemeChange={store.setReaderTheme}
             onExport={store.exportBackup}
             onImport={store.importBackup}
+            onResetStreak={store.resetToRealStreak}
+            onSimulateStreak={store.simulateStreakIncrement}
           />
         )}
       </main>
