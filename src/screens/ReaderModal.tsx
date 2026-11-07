@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Book, ReaderTheme } from '../types';
 import { getPageContent } from '../data/bookExcerpts';
+import { PdfCanvasViewer } from '../components/PdfCanvasViewer';
 
 interface ReaderModalProps {
   book: Book | null;
@@ -302,29 +303,18 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           </div>
         </main>
       ) : (
-        <main className="flex-1 w-full h-full bg-neutral-900 relative flex flex-col">
-          {/* Top PDF indicator */}
-          <div className="bg-neutral-800/90 text-white/80 px-4 py-1.5 text-xs flex items-center justify-between border-b border-neutral-700">
-            <span className="font-cairo">
-              نسخة الـ PDF الأصلية • الانتقال لصفحة: <b className="text-amber-400">{currentPage}</b>
-            </span>
-            <a
-              href={`${pdfUrl}#page=${currentPage}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-amber-400 hover:underline flex items-center gap-1 text-[11px]"
-            >
-              <span>فتح بمستعرض خارجي</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-
-          <iframe
-            key={`${book.id}-page-${currentPage}`}
-            src={`${pdfUrl}#page=${currentPage}&toolbar=0&navpanes=0`}
-            className="w-full flex-1 border-0"
-            title={`${book.title_ar} - صفحة ${currentPage}`}
-          />
+        <main className="flex-1 w-full h-full bg-neutral-900 relative flex flex-col overflow-hidden">
+          {pdfUrl ? (
+            <PdfCanvasViewer
+              url={pdfUrl}
+              pageNumber={currentPage}
+            />
+          ) : (
+            <div className="m-auto text-center p-6 text-theme-muted font-cairo">
+              <BookOpen className="w-10 h-10 mx-auto mb-2 opacity-50" />
+              <p>ملف الـ PDF غير متوفر لهذا الكتاب</p>
+            </div>
+          )}
         </main>
       )}
 
