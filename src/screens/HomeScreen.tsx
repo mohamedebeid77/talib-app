@@ -44,23 +44,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const dailyGoalReached = stats.pages_read_today >= 1 || stats.minutes_read_today >= 5;
 
   return (
-    <div className="space-y-5 pb-24">
+    <div className="space-y-6 pb-24">
       {/* Overall Journey Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-theme-surface border border-theme-border/80 p-5 shadow-subtle">
+      <div className="relative overflow-hidden rounded-3xl bg-theme-surface border border-theme-border/80 p-5 sm:p-6 shadow-subtle">
         <div className="flex items-center justify-between gap-4">
-          <div className="space-y-1.5 flex-1">
-            <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-theme-accent/15 text-theme-accent">
+          <div className="space-y-2 flex-1">
+            <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold bg-theme-accent/15 text-theme-accent">
               خطة المنهج الشرعي
             </span>
-            <h2 className="text-xl font-cairo font-bold text-theme-text leading-tight">
+            <h2 className="text-xl sm:text-2xl font-cairo font-bold text-theme-text leading-tight">
               رحلة التدرج في المتون
             </h2>
-            <p className="text-xs text-theme-muted font-normal leading-relaxed">
+            <p className="text-xs sm:text-sm text-theme-muted font-normal leading-relaxed">
               أنجزت حتى الآن {finishedBooksCount} من أصل {books.filter((b) => b.level <= 3).length} متناً أساسياً في المسار.
             </p>
             <button
               onClick={onNavigateToPath}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-theme-accent hover:underline pt-2"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-theme-accent hover:underline pt-1.5"
             >
               <span>استعراض خريطة المسار</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -75,57 +75,57 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
       {/* Continue Reading Card */}
       {activeBook && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between px-1">
-            <h3 className="text-sm font-cairo font-bold text-theme-text flex items-center gap-1.5">
+        <div className="space-y-3 pt-1">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-sm font-cairo font-bold text-theme-text flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-theme-accent" />
               <span>تابع القراءة الآن</span>
             </h3>
-            <span className="text-[11px] text-theme-muted">آخر كتاب فُتح</span>
+            <span className="text-[11px] text-theme-muted font-medium">آخر كتاب فُتح</span>
           </div>
 
           <div
             onClick={() => onOpenBook(activeBook)}
-            className="group relative cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-theme-surface to-theme-surfaceHover border border-theme-border p-4.5 transition-all duration-200 hover:border-theme-accent/40 active:scale-[0.99] shadow-sm"
+            className="group relative cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-theme-surface to-theme-surfaceHover border border-theme-border p-5 sm:p-6 transition-all duration-200 hover:border-theme-accent/40 active:scale-[0.99] shadow-sm"
           >
             {/* Background book texture hint */}
-            <div className="absolute top-0 left-0 w-24 h-24 bg-theme-accent/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute top-0 left-0 w-32 h-32 bg-theme-accent/5 rounded-full blur-2xl pointer-events-none" />
 
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1 flex-1">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-2 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-theme-accentMuted text-theme-accent">
+                  <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-theme-accentMuted text-theme-accent">
                     {activeBook.category}
                   </span>
-                  <span className="text-[11px] text-theme-muted">
+                  <span className="text-xs text-theme-muted font-medium">
                     {activeBook.level_name?.split(':')[0] || `المستوى ${activeBook.level}`}
                   </span>
                 </div>
 
-                <h4 className="text-lg font-amiri font-bold text-theme-text group-hover:text-theme-accent transition-colors">
+                <h4 className="text-xl sm:text-2xl font-amiri font-bold text-theme-text group-hover:text-theme-accent transition-colors pt-0.5">
                   {activeBook.title_ar}
                 </h4>
-                <p className="text-xs text-theme-muted font-medium">
-                  {activeBook.author_ar}
+                <p className="text-xs sm:text-sm text-theme-muted font-medium">
+                  تأليف: {activeBook.author_ar}
                 </p>
               </div>
 
-              <div className="p-2 rounded-xl bg-theme-surface border border-theme-border text-theme-muted group-hover:text-theme-accent group-hover:border-theme-accent/30 transition-all">
+              <div className="p-2.5 rounded-xl bg-theme-surface border border-theme-border text-theme-muted group-hover:text-theme-accent group-hover:border-theme-accent/30 transition-all shrink-0">
                 <ChevronLeft className="w-5 h-5" />
               </div>
             </div>
 
             {/* Reading progress bar */}
-            <div className="mt-4 pt-3 border-t border-theme-border/60">
-              <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
+            <div className="mt-5 pt-4 border-t border-theme-border/70">
+              <div className="flex items-center justify-between text-xs mb-2.5 font-medium">
                 <span className="text-theme-muted">
                   الصفحة {currentPage} من {totalPages}
                 </span>
-                <span className="font-bold text-theme-accent font-cairo">
+                <span className="font-bold text-theme-accent font-cairo text-sm">
                   {bookPercentage}%
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-theme-border/60 overflow-hidden">
+              <div className="w-full h-2.5 rounded-full bg-theme-bg/80 border border-theme-border/50 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-gradient-to-l from-theme-accent to-theme-accentHover transition-all duration-500"
                   style={{ width: `${Math.max(5, bookPercentage)}%` }}
@@ -133,12 +133,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </div>
 
               {/* Estimated Time Badge */}
-              <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-theme-border/30 text-[11px] text-theme-muted">
-                <div className="flex items-center gap-1 text-theme-accent">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span className="font-medium">المتبقي لختم المتن:</span>
+              <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-theme-border/40 text-xs">
+                <div className="flex items-center gap-1.5 text-theme-accent">
+                  <Clock className="w-4 h-4" />
+                  <span className="font-medium text-theme-muted">المتبقي لختم المتن:</span>
                 </div>
-                <span className="font-cairo font-bold text-theme-text bg-theme-bg/80 px-2 py-0.5 rounded-md">
+                <span className="font-cairo font-bold text-theme-text bg-theme-bg px-2.5 py-1 rounded-lg border border-theme-border/50 text-[11px]">
                   {estTime.formatted}
                 </span>
               </div>
