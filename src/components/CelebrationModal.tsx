@@ -150,9 +150,9 @@ export const CelebrationModal: React.FC<CelebrationModalProps> = ({
 
         {/* Encouraging Hadith Card */}
         <div className="p-3.5 rounded-2xl bg-theme-surface border border-theme-border/70 text-xs font-amiri leading-relaxed text-theme-text text-justify">
-          «مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ»
+          «وَمَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا، سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ»
           <span className="block text-[10px] text-theme-muted font-cairo text-left mt-1">
-            — رواه مسلم
+            [رواه مسلم في صحيحه، رقم 2699]
           </span>
         </div>
 

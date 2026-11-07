@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BookOpen, Sparkles, Flame, CheckCircle2, Heart, ArrowLeft } from 'lucide-react';
 import { AppTheme, UserStats } from '../types';
 
@@ -23,8 +23,8 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
   const hour = new Date().getHours();
   const isMorning = hour >= 4 && hour < 14;
   const timeGreeting = isMorning 
-    ? 'صباح مبارك مليء بالبركة والنور' 
-    : 'مساء مبارك يملؤه السكينة والتوفيق';
+    ? 'صَبَاحٌ مُبَارَكٌ بِعَوْنِ اللَّهِ وَتَوْفِيقِهِ' 
+    : 'مَسَاءٌ مُبَارَكٌ تَمْلَؤُهُ السَّكِينَةُ وَالْبَرَكَةُ';
 
   const todayStr = new Date().toLocaleDateString('ar-EG', {
     weekday: 'long',
@@ -34,10 +34,10 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 select-none">
       {/* Background motif */}
       <div 
-        className="absolute inset-0 opacity-[0.06] bg-repeat pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] bg-repeat pointer-events-none"
         style={{
           backgroundImage: `url('/assets/talib-texture-${theme}.jpg')`,
           backgroundSize: '280px',
@@ -55,50 +55,54 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
             alt="شعار طالب" 
             className="w-full h-full object-cover rounded-xl"
             onError={(e) => {
-              // Fallback icon if image doesn't load
               e.currentTarget.style.display = 'none';
             }}
           />
           <BookOpen className="w-8 h-8 text-theme-accent absolute" />
         </div>
 
-        {/* Basmala */}
-        <p className="font-amiri text-lg text-theme-accent font-bold tracking-wide mb-1">
-          بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+        {/* Basmala (برسم المصحف الشريف) */}
+        <p className="font-amiri text-xl text-theme-accent font-bold tracking-wide mb-1 leading-relaxed">
+          بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
         </p>
 
         {/* Date & Time Greeting */}
         <span className="inline-block text-[11px] text-theme-muted font-medium mb-1">
           {todayStr}
         </span>
-        <h2 className="text-xl font-cairo font-bold text-theme-text mb-3">
+        <h2 className="text-lg font-cairo font-bold text-theme-text mb-3">
           {timeGreeting}
         </h2>
 
-        {/* Hadith / Spiritual Quote Card */}
-        <div className="rounded-2xl bg-theme-bg/80 border border-theme-border/70 p-4 mb-4 text-right">
+        {/* Hadith / Spiritual Quote Card (موثق باللفظ الصحيح من صحيح مسلم) */}
+        <div className="rounded-2xl bg-theme-bg/85 border border-theme-border/70 p-4 mb-3.5 text-right">
           <div className="flex items-center gap-1.5 text-xs text-theme-accent font-bold mb-1.5">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>بشارة لطالب العلم</span>
+            <span>بِشَارَةٌ لِطَالِبِ الْعِلْمِ الشَّرْعِيِّ</span>
           </div>
-          <p className="font-amiri text-sm leading-relaxed text-theme-text font-medium mb-1.5">
-            «مَنْ سَلَكَ طَرِيقاً يَلْتَمِسُ فِيهِ عِلْماً، سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقاً إِلَى الجَنَّةِ»
+          <p className="font-amiri text-base leading-relaxed text-theme-text font-medium mb-1.5">
+            «وَمَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا، سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ»
           </p>
-          <span className="block text-[10px] text-theme-muted font-normal">
-            — رواه مسلم
+          <span className="block text-[10px] text-theme-muted font-cairo font-normal">
+            [رواه مسلم في صحيحه، رقم 2699]
           </span>
         </div>
 
-        {/* Intention Reminder (استحضار النية) */}
-        <div className="flex items-start gap-2 bg-theme-accentMuted/40 border border-theme-accent/20 rounded-xl p-3 mb-5 text-right">
+        {/* Prophetic Supplication (الدعاء المأثور لطلب العلم النافع) */}
+        <div className="flex items-start gap-2 bg-theme-accentMuted/30 border border-theme-accent/20 rounded-xl p-3 mb-4 text-right">
           <Heart className="w-4 h-4 text-theme-accent shrink-0 mt-0.5" />
-          <p className="text-[11px] text-theme-text/90 font-medium leading-relaxed">
-            استحضر نيتك الخالصة لله وأنت تُقبل على مدارسة المتون، واجعل دقائق قراءتك اليوم خطوة تقرّبك إلى مرضاته.
-          </p>
+          <div className="space-y-0.5">
+            <p className="font-amiri text-xs font-bold text-theme-accent leading-relaxed">
+              «اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا»
+            </p>
+            <span className="text-[10px] text-theme-muted block font-cairo">
+              [أخرجه الإمام ابن ماجه، وصححه الألباني]
+            </span>
+          </div>
         </div>
 
         {/* Mini stats preview */}
-        <div className="grid grid-cols-2 gap-2 mb-5">
+        <div className="grid grid-cols-2 gap-2 mb-4.5">
           <div className="p-2.5 rounded-xl bg-theme-bg/60 border border-theme-border/50 text-center">
             <div className="flex items-center justify-center gap-1 text-[11px] text-theme-muted mb-0.5">
               <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
@@ -120,12 +124,12 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           </div>
         </div>
 
-        {/* Big Prominent Action Button */}
+        {/* Big Prominent Action Button (مضبوط لغوياً بحذف الألف: بِسْمِ اللَّهِ) */}
         <button
           onClick={onEnterApp}
           className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-theme-accent to-theme-accentHover text-slate-950 font-cairo font-bold text-base flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-all hover:brightness-105"
         >
-          <span>باسم الله.. ابدأ وِرد اليوم</span>
+          <span>بِسْمِ اللَّهِ.. ابْدَأْ وِرْدَ الْيَوْمِ</span>
           <ArrowLeft className="w-4 h-4" />
         </button>
       </div>
