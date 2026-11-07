@@ -9,6 +9,7 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { BookDetailModal } from './screens/BookDetailModal';
 import { ReaderModal } from './screens/ReaderModal';
 import { CelebrationModal } from './components/CelebrationModal';
+import { WelcomeModal } from './components/WelcomeModal';
 import { Book } from './types';
 
 export const App: React.FC = () => {
@@ -17,6 +18,7 @@ export const App: React.FC = () => {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [readingBook, setReadingBook] = useState<Book | null>(null);
   const [readerStartPage, setReaderStartPage] = useState<number>(1);
+  const [showWelcome, setShowWelcome] = useState<boolean>(true);
 
   const overallProgress = store.getOverallProgress();
   const getLevelPercentage = (level: number) => store.getLevelProgress(level).percentage;
@@ -65,7 +67,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content View */}
-      <main className="flex-1 max-w-md w-full mx-auto px-4 pt-4">
+      <main className="flex-1 max-w-md w-full mx-auto px-4 pt-4 pb-28">
         {activeTab === 'home' && (
           <HomeScreen
             books={store.books}
@@ -148,6 +150,15 @@ export const App: React.FC = () => {
         isOpen={!!store.celebrationBook}
         onClose={() => store.setCelebrationBook(null)}
         onNextBook={handleNextBookAfterCelebration}
+      />
+
+      {/* Opening Spiritual Welcome & Intention Modal */}
+      <WelcomeModal
+        isOpen={showWelcome}
+        theme={store.theme}
+        stats={store.stats}
+        overallProgress={overallProgress}
+        onEnterApp={() => setShowWelcome(false)}
       />
     </div>
   );

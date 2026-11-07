@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ stats, theme, onThemeToggle }) =
   });
 
   return (
-    <header className="relative pt-6 pb-4 px-4 bg-theme-surface/70 border-b border-theme-border/60 backdrop-blur-md sticky top-0 z-30 transition-all">
+    <header className="relative pt-safe pb-3.5 px-5 bg-theme-surface/85 border-b border-theme-border/70 backdrop-blur-md sticky top-0 z-30 transition-all shadow-sm">
       {/* Subtle Islamic Motif Background Overlay */}
       <div 
         className="absolute inset-0 opacity-[var(--bg-pattern-opacity)] bg-repeat pointer-events-none"

@@ -73,6 +73,15 @@ body {
   min-height: 100vh;
 }
 
+/* Safe area insets for Android and iOS mobile displays */
+.pt-safe {
+  padding-top: max(2.25rem, calc(env(safe-area-inset-top, 0px) + 1.75rem));
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.85rem));
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
