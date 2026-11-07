@@ -12,17 +12,18 @@
 
   <!-- زر التحميل الرئيسي للأجهزة المحمولة -->
   <a href="https://github.com/mohamedebeid77/talib-app/releases/download/v1.0.0/talib.apk">
-    <img src="https://img.shields.io/badge/تحميل_تطبيق_طالب_للأندرويد_(ملف_APK)-198_ميجابايت-065f46?style=for-the-badge&logo=android&logoColor=white" height="54" alt="تحميل التطبيق للأندرويد" />
+    <img src="https://img.shields.io/badge/تحميل_تطبيق_طالب_للأندرويد_(ملف_APK)-199_ميجابايت-065f46?style=for-the-badge&logo=android&logoColor=white" height="54" alt="تحميل التطبيق للأندرويد" />
   </a>
 
   <br /><br />
 
   <p>
     <a href="https://github.com/mohamedebeid77/talib-app/releases/tag/v1.0.0">
-      <img src="https://img.shields.io/badge/الإصدار-1.0.0-047857?style=flat-square" alt="الإصدار الأول" />
+      <img src="https://img.shields.io/badge/الإصدار-1.1.0_المحدث-047857?style=flat-square" alt="الإصدار المحدث" />
     </a>
     <img src="https://img.shields.io/badge/نظام_التشغيل-أندرويد_7_فما_فوق-0369a1?style=flat-square&logo=android&logoColor=white" alt="أندرويد" />
     <img src="https://img.shields.io/badge/المحتوى-24_متناً_وكتاباً_شرعياً-b45309?style=flat-square" alt="24 كتاباً" />
+    <img src="https://img.shields.io/badge/الحجم-199_ميجابايت_(شامل_المكتبة_كاملة)-1e293b?style=flat-square" alt="حجم الملف" />
     <img src="https://img.shields.io/badge/الاتصال-أوفلاين_بالكامل-15803d?style=flat-square" alt="يعمل بدون إنترنت" />
     <img src="https://img.shields.io/badge/الخصوصية-خالٍ_من_الإعلانات_والتتبع-475569?style=flat-square" alt="خصوصية تامة" />
   </p>
@@ -33,8 +34,18 @@
 
 ### رابط التنزيل المباشر
 يمكنك تنزيل ملف التثبيت المباشر بصيغة APK عبر الرابط التالي:  
-**[تحميل ملف talib.apk بحجم 198 ميجابايت](https://github.com/mohamedebeid77/talib-app/releases/download/v1.0.0/talib.apk)**  
-*(الملف يحتوي مسبقاً على النسخ الأصلية والنصوص المشكولة لكافة الكتب الأربعة والعشرين)*
+**[تحميل ملف talib.apk (الحجم: 199 ميجابايت تقريباً)](https://github.com/mohamedebeid77/talib-app/releases/download/v1.0.0/talib.apk)**  
+
+> **ملاحظة حول الحجم:** الحجم (حوالي 199 ميجابايت) يشمل الحزمة الكاملة محملة مسبقاً بجميع نسخ الـ PDF المحققة والنصوص المشكولة لكافة الكتب الـ 24، بالإضافة إلى الخطوط العربية ومحرك القراءة، ليعمل التطبيق فور تثبيته بنسبة 100% دون أن يحتاج لتنزيل بايت واحد من الإنترنت بعد ذلك.
+
+---
+
+## أبرز ما جاء في هذا التحديث (الإصدار 1.1.0)
+
+* **قارئ PDF داخلي مدمج وسريع:** قراءة النسخ المصورة المعتمدة مباشرة داخل التطبيق دون شاشات بيضاء وبدون الحاجة لفتح أي تطبيقات خارجية، مع إمكانية التكبير والتصغير وتصفح الصفحات بسلاسة.
+* **شاشة بداية هادئة وتذكير بالنية:** تفتح عند تشغيل التطبيق مع البسملة الشريفة وحديث نبوي صحيح في فضل العلم وتذكير باحتساب الأجر وورد اليوم.
+* **تحسين المسافات وتنسيق الواجهة:** توسيع المسافات بين العناوين والبانرات الداخلية لراحة العين وتناسق العرض على مختلف شاشات أجهزة الأندرويد.
+* **تدقيق النصوص واللغة:** مراجعة الأحاديث النبوية وتصحيح رسم الكلمات وفق القواعد اللغوية السليمة.
 
 ---
 
