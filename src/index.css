@@ -1,0 +1,93 @@
+@import './styles/fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+body[data-theme='midnight'] {
+  --color-bg: #0A0B0E;
+  --color-surface: #13161C;
+  --color-surface-hover: #1A1F28;
+  --color-border: #232734;
+  --color-accent: #D4AF37;
+  --color-accent-hover: #E6C66E;
+  --color-accent-muted: rgba(212, 175, 55, 0.15);
+  --color-accent-gold: #D4AF37;
+  --color-text: #EDE8DF;
+  --color-muted: #8E95A5;
+  --color-success: #2EB886;
+  --bg-pattern-opacity: 0.04;
+}
+
+body[data-theme='emerald'] {
+  --color-bg: #06130E;
+  --color-surface: #0D221A;
+  --color-surface-hover: #143226;
+  --color-border: #183D30;
+  --color-accent: #2DD4BF;
+  --color-accent-hover: #5EEAD4;
+  --color-accent-muted: rgba(45, 212, 191, 0.15);
+  --color-accent-gold: #D1A751;
+  --color-text: #EAF6F0;
+  --color-muted: #7FA899;
+  --color-success: #34D399;
+  --bg-pattern-opacity: 0.05;
+}
+
+body[data-theme='parchment'] {
+  --color-bg: #F8F4EB;
+  --color-surface: #EFE9DC;
+  --color-surface-hover: #E5DEC9;
+  --color-border: #DFD7C4;
+  --color-accent: #0F5132;
+  --color-accent-hover: #157347;
+  --color-accent-muted: rgba(15, 81, 50, 0.12);
+  --color-accent-gold: #9C6A2E;
+  --color-text: #1A1D1A;
+  --color-muted: #696F67;
+  --color-success: #198754;
+  --bg-pattern-opacity: 0.08;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+input, textarea {
+  user-select: text;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+  direction: rtl;
+  text-align: right;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}

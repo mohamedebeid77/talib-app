@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+
+# Android build outputs & caches
+.gradle/
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+android/local.properties
+android/.idea/
+*.apk
+
+# Environment & temporary
+.env
+.env.local
+.DS_Store
+Thumbs.db
+scripts/ktobati_out.txt
+scripts/*.json
+scripts/ibn_qayyim_files.txt
